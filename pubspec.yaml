@@ -1,0 +1,50 @@
+name: shamsuna
+description: "A new Flutter project."
+
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  supabase_flutter: ^2.17.2
+  flutter_svg: ^2.3.0
+  flutter_cache_manager: ^3.4.2
+  pdf: ^3.12.0
+  excel: ^4.0.6
+  path_provider: ^2.1.6
+  share_plus: ^13.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/shamsuna_background.webp
+    - assets/fonts/thmanyahserifdisplay-Regular.otf
+    - assets/fonts/thmanyahserifdisplay-Bold.otf
+    - assets/fonts/Amiri-Regular.ttf
+    - assets/fonts/Amiri-Bold.ttf
+
+  fonts:
+    - family: ThmanyahSerifDisplay
+      fonts:
+        - asset: assets/fonts/thmanyahserifdisplay-Regular.otf
+          weight: 400
+        - asset: assets/fonts/thmanyahserifdisplay-Medium.otf
+          weight: 500
+        - asset: assets/fonts/thmanyahserifdisplay-Bold.otf
+          weight: 700
+        - asset: assets/fonts/thmanyahserifdisplay-Black.otf
+          weight: 900
