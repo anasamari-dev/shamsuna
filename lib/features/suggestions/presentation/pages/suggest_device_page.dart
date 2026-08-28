@@ -1,14 +1,20 @@
+<<<<<<< HEAD
 import 'dart:async';
 
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_background.dart';
+<<<<<<< HEAD
 import '../../../../core/widgets/shamsuna_bottom_bar.dart';
 import '../../../calculation/presentation/pages/report_setup_page.dart';
 import '../../../reports/presentation/pages/compare_reports_page.dart';
 import '../../../reports/presentation/pages/my_reports_page.dart';
 
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 import '../../../calculation/data/models/device_category.dart';
 import '../../../calculation/data/repositories/device_repository.dart';
 import '../../data/models/device_suggestion.dart';
@@ -16,9 +22,13 @@ import '../../data/repositories/suggestions_repository.dart';
 
 /// صفحة إرسال جهاز جديد للمراجعة من المستخدم.
 class SuggestDevicePage extends StatefulWidget {
+<<<<<<< HEAD
   const SuggestDevicePage({super.key, this.showBottomBar = true});
 
   final bool showBottomBar;
+=======
+  const SuggestDevicePage({super.key});
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 
   @override
   State<SuggestDevicePage> createState() => _SuggestDevicePageState();
@@ -33,7 +43,10 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
   final _suggestions = SuggestionsRepository();
 
   late Future<List<DeviceCategory>> _categoriesFuture;
+<<<<<<< HEAD
   late Future<List<SubmittedDeviceSuggestion>> _mySuggestionsFuture;
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   int? _categoryId;
   bool _saving = false;
 
@@ -41,7 +54,10 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
   void initState() {
     super.initState();
     _categoriesFuture = _categories.fetchCategories();
+<<<<<<< HEAD
     _mySuggestionsFuture = _suggestions.fetchMine();
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   }
 
   @override
@@ -53,6 +69,7 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
   }
 
   Future<void> _submit() async {
+<<<<<<< HEAD
     // نغلق لوحة المفاتيح قبل بدء الطلب حتى لا تتعارض مع تغيير حالة الصفحة.
     FocusManager.instance.primaryFocus?.unfocus();
 
@@ -114,6 +131,32 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
       if (mounted) {
         setState(() => _saving = false);
       }
+=======
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _saving = true);
+
+    try {
+      await _suggestions.submit(
+        DeviceSuggestion(
+          categoryId: _categoryId!,
+          companyName: _company.text,
+          modelName: _model.text,
+          wattageW: double.parse(_wattage.text.trim()),
+        ),
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('تم إرسال اقتراح الجهاز للمراجعة')),
+      );
+      Navigator.of(context).pop();
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('تعذر إرسال الاقتراح: $error')));
+    } finally {
+      if (mounted) setState(() => _saving = false);
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
     }
   }
 
@@ -121,6 +164,7 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
+<<<<<<< HEAD
       resizeToAvoidBottomInset: false,
       extendBody: true,
       bottomNavigationBar: widget.showBottomBar
@@ -145,6 +189,8 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
         ),
       )
           : null,
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
       body: AppBackground(
         child: SafeArea(
           child: CustomScrollView(
@@ -158,7 +204,11 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
                 centerTitle: true,
               ),
               SliverPadding(
+<<<<<<< HEAD
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+=======
+                padding: const EdgeInsets.all(20),
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
                 sliver: SliverToBoxAdapter(
                   child: _GlassPanel(
                     child: Form(
@@ -276,6 +326,7 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
                   ),
                 ),
               ),
+<<<<<<< HEAD
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 120),
                 sliver: SliverToBoxAdapter(
@@ -289,6 +340,8 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
                   ),
                 ),
               ),
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
             ],
           ),
         ),
@@ -332,6 +385,7 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
   }
 }
 
+<<<<<<< HEAD
 class _MySuggestionsPanel extends StatelessWidget {
   const _MySuggestionsPanel({
     required this.future,
@@ -504,6 +558,8 @@ class _SuggestionTile extends StatelessWidget {
   }
 }
 
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 class _GlassPanel extends StatelessWidget {
   const _GlassPanel({required this.child});
 
@@ -521,4 +577,8 @@ class _GlassPanel extends StatelessWidget {
       child: child,
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4

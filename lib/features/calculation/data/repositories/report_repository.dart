@@ -20,10 +20,14 @@ class ReportRepository {
     final payload = details
         .map(
           (item) => {
+<<<<<<< HEAD
             'device_id': item.isCustomDevice ? null : item.device.id,
             'custom_device_id': item.isCustomDevice
                 ? item.customDeviceId
                 : null,
+=======
+            'device_id': item.device.id,
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
             'quantity': item.quantity,
             'day_hours': item.dayHours,
             'night_hours': item.nightHours,

@@ -14,6 +14,7 @@ class ReportDeviceDetailDraft {
   final double dayHours; // ساعات التشغيل نهارًا.
   final double nightHours; // ساعات التشغيل ليلًا.
 
+<<<<<<< HEAD
   /// يحدد هل الجهاز قادم من جدول custom_devices.
   bool get isCustomDevice => device.specifications['_is_custom_device'] == true;
 
@@ -21,12 +22,18 @@ class ReportDeviceDetailDraft {
   int? get customDeviceId =>
       (device.specifications['_custom_device_id'] as num?)?.toInt();
 
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   /// يحول الاختيار إلى شكل مناسب للحفظ داخل report_device_details.
   Map<String, dynamic> toInsertMap({required int reportId}) {
     return {
       'report_id': reportId,
+<<<<<<< HEAD
       'device_id': isCustomDevice ? null : device.id,
       'custom_device_id': isCustomDevice ? customDeviceId : null,
+=======
+      'device_id': device.id,
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
       'category_name_snapshot': '',
       'company_name_snapshot': '',
       'model_name_snapshot': device.modelName,

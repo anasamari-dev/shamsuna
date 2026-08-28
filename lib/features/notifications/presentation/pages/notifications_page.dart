@@ -27,6 +27,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
     _future = _repository.fetchMine();
   }
 
+<<<<<<< HEAD
   Future<void> _reload() async {
     // بدء طلب البيانات خارج setState لأن fetchMine دالة غير متزامنة.
     final future = _repository.fetchMine();
@@ -43,6 +44,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
     // انتظار انتهاء الطلب حتى يعمل RefreshIndicator بشكل صحيح.
     await future;
+=======
+  void _reload() {
+    setState(() => _future = _repository.fetchMine());
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   }
 
   Future<void> _handleTap(AppNotification notification) async {

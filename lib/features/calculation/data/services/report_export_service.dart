@@ -247,7 +247,11 @@ class ReportExportService {
       _client
           .from('report_device_details')
           .select(
+<<<<<<< HEAD
             'device_id, custom_device_id, quantity, day_hours, night_hours, category_name_snapshot, company_name_snapshot, model_name_snapshot, wattage_w_snapshot',
+=======
+            'device_id, quantity, day_hours, night_hours, category_name_snapshot, company_name_snapshot, model_name_snapshot, wattage_w_snapshot',
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
           )
           .eq('report_id', reportId)
           .order('detail_id'),
@@ -259,7 +263,10 @@ class ReportExportService {
     final detailRows = metadata[3] as List<dynamic>;
 
     final deviceIds = detailRows
+<<<<<<< HEAD
         .where((row) => row['device_id'] != null)
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
         .map((row) => (row['device_id'] as num).toInt())
         .toSet()
         .toList(growable: false);
@@ -311,8 +318,12 @@ class ReportExportService {
 
     final devices = detailRows
         .map((row) {
+<<<<<<< HEAD
           final deviceId = (row['device_id'] as num?)?.toInt();
           final device = deviceId == null ? null : deviceById[deviceId];
+=======
+          final device = deviceById[(row['device_id'] as num).toInt()];
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
           final wattage = device == null
               ? _asDouble(row['wattage_w_snapshot'])
               : _asDouble(device['wattage_w']);

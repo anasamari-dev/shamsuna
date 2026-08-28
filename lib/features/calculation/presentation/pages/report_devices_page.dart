@@ -21,6 +21,7 @@ String formatUserNumber(num value) {
 
 /// يدير قائمة الأجهزة المختارة قبل الحفظ النهائي للتقرير.
 class ReportDevicesPage extends StatefulWidget {
+<<<<<<< HEAD
   const ReportDevicesPage({
     super.key,
     required this.draft,
@@ -28,6 +29,9 @@ class ReportDevicesPage extends StatefulWidget {
   });
 
   final bool showBottomBar;
+=======
+  const ReportDevicesPage({super.key, required this.draft});
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 
   final ReportDraft draft;
 
@@ -61,6 +65,7 @@ class _ReportDevicesPageState extends State<ReportDevicesPage> {
   }
 
   Future<void> _chooseDevice() async {
+<<<<<<< HEAD
     // نستخدم مفتاحًا للتحكم في صفحة الاختيار وإعادتها إلى الفئات بعد الحفظ.
     final selectionKey = GlobalKey<DeviceSelectionPageState>();
 
@@ -73,6 +78,12 @@ class _ReportDevicesPageState extends State<ReportDevicesPage> {
             // يغلق صفحة الاختيار ويعيد المستخدم إلى تقرير الأحمال عند الطلب.
             Navigator.of(context).pop();
           },
+=======
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => DeviceSelectionPage(
+          draft: widget.draft,
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
           onDeviceSelected: (device) {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -80,6 +91,7 @@ class _ReportDevicesPageState extends State<ReportDevicesPage> {
                   draft: widget.draft,
                   device: device,
                   onSaved: (detail) {
+<<<<<<< HEAD
                     // نحفظ الجهاز داخل قائمة التقرير الحالية.
                     setState(() => _details.add(detail));
 
@@ -94,6 +106,10 @@ class _ReportDevicesPageState extends State<ReportDevicesPage> {
                         duration: Duration(milliseconds: 900),
                       ),
                     );
+=======
+                    setState(() => _details.add(detail));
+                    Navigator.of(context).pop();
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
                   },
                 ),
               ),
@@ -103,7 +119,10 @@ class _ReportDevicesPageState extends State<ReportDevicesPage> {
       ),
     );
 
+<<<<<<< HEAD
     // يعيد بناء ملخص الأحمال عند العودة إلى صفحة التقرير.
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
     if (mounted) setState(() {});
   }
 

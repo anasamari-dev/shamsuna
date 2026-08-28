@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_background.dart';
+<<<<<<< HEAD
 import '../../../../core/widgets/shamsuna_bottom_bar.dart';
 
 import '../../../calculation/presentation/pages/calculation_result_page.dart';
@@ -9,6 +10,9 @@ import '../../../calculation/presentation/pages/report_devices_page.dart';
 import '../../../calculation/presentation/pages/report_setup_page.dart';
 import '../../../suggestions/presentation/pages/suggest_device_page.dart';
 
+=======
+import '../../../calculation/presentation/pages/calculation_result_page.dart';
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 import '../../data/models/user_report.dart';
 import 'edit_report_page.dart';
 import '../../data/repositories/reports_repository.dart';
@@ -16,9 +20,13 @@ import 'compare_reports_page.dart';
 
 /// صفحة التقارير المحفوظة للمستخدم الحالي.
 class MyReportsPage extends StatefulWidget {
+<<<<<<< HEAD
   const MyReportsPage({super.key, this.showBottomBar = true});
 
   final bool showBottomBar;
+=======
+  const MyReportsPage({super.key});
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 
   @override
   State<MyReportsPage> createState() => _MyReportsPageState();
@@ -38,6 +46,7 @@ class _MyReportsPageState extends State<MyReportsPage> {
     _reportsFuture = _repository.fetchMyReports();
   }
 
+<<<<<<< HEAD
   void _openCreateReport() {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -50,10 +59,13 @@ class _MyReportsPageState extends State<MyReportsPage> {
     );
   }
 
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
+<<<<<<< HEAD
       resizeToAvoidBottomInset: false,
       extendBody: true,
       bottomNavigationBar: widget.showBottomBar
@@ -74,6 +86,8 @@ class _MyReportsPageState extends State<MyReportsPage> {
               ),
             )
           : null,
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
       body: AppBackground(
         child: SafeArea(
           child: CustomScrollView(
@@ -107,7 +121,11 @@ class _MyReportsPageState extends State<MyReportsPage> {
                 ),
               ),
               SliverPadding(
+<<<<<<< HEAD
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 120),
+=======
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
                 sliver: FutureBuilder<List<UserReport>>(
                   future: _reportsFuture,
                   builder: (context, snapshot) {

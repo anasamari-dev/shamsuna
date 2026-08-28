@@ -65,6 +65,7 @@ class CatalogAdminRepository {
     required String iconKey,
     required bool isActive,
   }) async {
+<<<<<<< HEAD
     await _client
         .from('device_categories')
         .update({
@@ -74,6 +75,14 @@ class CatalogAdminRepository {
           'updated_at': DateTime.now().toIso8601String(),
         })
         .eq('category_id', categoryId);
+=======
+    await _client.from('device_categories').update({
+      'name_ar': nameAr.trim(),
+      'icon_key': iconKey.trim(),
+      'is_active': isActive,
+      'updated_at': DateTime.now().toIso8601String(),
+    }).eq('category_id', categoryId);
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   }
 
   Future<void> createCompany({
@@ -121,6 +130,7 @@ class CatalogAdminRepository {
     required String? iconUrl,
     required bool isActive,
   }) async {
+<<<<<<< HEAD
     await _client
         .from('catalog_companies')
         .update({
@@ -130,6 +140,14 @@ class CatalogAdminRepository {
           'updated_at': DateTime.now().toIso8601String(),
         })
         .eq('company_id', companyId);
+=======
+    await _client.from('catalog_companies').update({
+      'name': name.trim(),
+      'icon_url': _nullable(iconUrl),
+      'is_active': isActive,
+      'updated_at': DateTime.now().toIso8601String(),
+    }).eq('company_id', companyId);
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   }
 
   Future<void> createDevice({
@@ -165,6 +183,7 @@ class CatalogAdminRepository {
     required Map<String, dynamic> specifications,
     required bool isActive,
   }) async {
+<<<<<<< HEAD
     await _client
         .from('catalog_devices')
         .update({
@@ -178,12 +197,25 @@ class CatalogAdminRepository {
           'updated_at': DateTime.now().toIso8601String(),
         })
         .eq('device_id', deviceId);
+=======
+    await _client.from('catalog_devices').update({
+      'company_name': companyName.trim(),
+      'model_name': modelName.trim(),
+      'short_name': shortName.trim(),
+      'description': description.trim(),
+      'wattage_w': wattageW,
+      'specifications': specifications,
+      'is_active': isActive,
+      'updated_at': DateTime.now().toIso8601String(),
+    }).eq('device_id', deviceId);
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   }
 
   Future<void> setDeviceActive({
     required int deviceId,
     required bool isActive,
   }) async {
+<<<<<<< HEAD
     await _client
         .from('catalog_devices')
         .update({
@@ -191,6 +223,12 @@ class CatalogAdminRepository {
           'updated_at': DateTime.now().toIso8601String(),
         })
         .eq('device_id', deviceId);
+=======
+    await _client.from('catalog_devices').update({
+      'is_active': isActive,
+      'updated_at': DateTime.now().toIso8601String(),
+    }).eq('device_id', deviceId);
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   }
 
   static List<Map<String, dynamic>> _maps(Iterable<dynamic> rows) {

@@ -88,6 +88,7 @@ class _EditReportPageState extends State<EditReportPage> {
   }
 
   Future<void> _addDevice() async {
+<<<<<<< HEAD
     // نستخدم مفتاحًا لإعادة صفحة الاختيار إلى الفئات بعد حفظ كل جهاز.
     final selectionKey = GlobalKey<DeviceSelectionPageState>();
 
@@ -100,6 +101,12 @@ class _EditReportPageState extends State<EditReportPage> {
             // يغلق صفحة الاختيار ويعيد المستخدم إلى محرر التقرير.
             Navigator.of(context).pop();
           },
+=======
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => DeviceSelectionPage(
+          draft: _draft!,
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
           onDeviceSelected: (device) {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -107,6 +114,7 @@ class _EditReportPageState extends State<EditReportPage> {
                   draft: _draft!,
                   device: device,
                   onSaved: (detail) {
+<<<<<<< HEAD
                     // يضيف الحمل إلى مسودة التقرير المعدلة.
                     setState(() => _details.add(detail));
 
@@ -121,6 +129,10 @@ class _EditReportPageState extends State<EditReportPage> {
                         duration: Duration(milliseconds: 900),
                       ),
                     );
+=======
+                    setState(() => _details.add(detail));
+                    Navigator.of(context).pop();
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
                   },
                 ),
               ),
@@ -143,7 +155,10 @@ class _EditReportPageState extends State<EditReportPage> {
             setState(() => _details[index] = detail);
             Navigator.of(context).pop();
           },
+<<<<<<< HEAD
           
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
         ),
       ),
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_background.dart';
+<<<<<<< HEAD
 import '../../../../core/widgets/shamsuna_bottom_bar.dart';
 import '../../../calculation/presentation/pages/report_devices_page.dart';
 import '../../../calculation/presentation/pages/report_setup_page.dart';
@@ -29,12 +30,23 @@ class AdminDashboardPage extends StatelessWidget {
     );
   }
 
+=======
+import 'admin_suggestions_page.dart';
+import 'admin_catalog_page.dart';
+import '../../../notifications/presentation/widgets/notification_bell.dart';
+
+/// لوحة مستقلة للمشرف، وستربط لاحقًا بإدارة الاقتراحات والكتالوج.
+class AdminDashboardPage extends StatelessWidget {
+  const AdminDashboardPage({super.key});
+
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: AppBackground(
         child: SafeArea(
+<<<<<<< HEAD
           child: Stack(
             children: [
               CustomScrollView(
@@ -114,6 +126,56 @@ class AdminDashboardPage extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (_) => const SuggestDevicePage(),
                     ),
+=======
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                backgroundColor: Colors.transparent,
+                surfaceTintColor: Colors.transparent,
+                title: const Text('لوحة المشرف'),
+                centerTitle: true,
+                actions: const [NotificationBell(isAdmin: true)],
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.all(20),
+                sliver: SliverToBoxAdapter(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const _AdminBanner(),
+                      const SizedBox(height: 18),
+                      _AdminAction(
+                        icon: Icons.devices_other_rounded,
+                        title: 'اقتراحات الأجهزة',
+                        subtitle: 'مراجعة الاقتراحات وقبولها أو رفضها',
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const AdminSuggestionsPage(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      _AdminAction(
+                        icon: Icons.inventory_2_outlined,
+                        title: 'إدارة الكتالوج',
+                        subtitle: 'إدارة الفئات والشركات والأجهزة',
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const AdminCatalogPage(),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      _AdminAction(
+                        icon: Icons.assessment_outlined,
+                        title: 'جميع التقارير',
+                        subtitle: 'عرض تقارير المستخدمين للمراجعة',
+                        onTap: () => _comingSoon(context),
+                      ),
+                    ],
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
                   ),
                 ),
               ),
@@ -123,6 +185,15 @@ class AdminDashboardPage extends StatelessWidget {
       ),
     );
   }
+<<<<<<< HEAD
+=======
+
+  void _comingSoon(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('سيتم ربط هذه الأداة في الخطوة التالية')),
+    );
+  }
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 }
 
 class _AdminBanner extends StatelessWidget {
@@ -130,19 +201,34 @@ class _AdminBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     return const _GlassBox(
       child: Row(
         children: [
           Icon(
+=======
+    return _GlassBox(
+      child: Row(
+        children: [
+          const Icon(
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
             Icons.admin_panel_settings_outlined,
             color: AppColors.textLight,
             size: 46,
           ),
+<<<<<<< HEAD
           SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+=======
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
                 Text(
                   'وضع المشرف',
                   style: TextStyle(

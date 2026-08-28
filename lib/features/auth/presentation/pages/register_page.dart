@@ -47,7 +47,10 @@ class _RegisterPageState extends State<RegisterPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
         data: {'display_name': _nameController.text.trim()},
+<<<<<<< HEAD
         emailRedirectTo: 'shamsuna://email-confirmed',
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
       );
 
       if (!mounted) return; // منع استخدام الصفحة بعد إغلاقها.

@@ -7,9 +7,13 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_background.dart';
 import '../../data/models/catalog_company.dart';
 import '../../data/models/catalog_device.dart';
+<<<<<<< HEAD
 import '../../data/models/custom_device.dart';
 import '../../data/models/device_category.dart';
 import '../../data/repositories/custom_device_repository.dart';
+=======
+import '../../data/models/device_category.dart';
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 import '../../data/repositories/device_repository.dart';
 
 /// شاشة اختيار الجهاز: فئات ثم شركات ثم أجهزة.
@@ -19,30 +23,47 @@ class DeviceSelectionPage extends StatefulWidget {
     super.key,
     required this.draft,
     required this.onDeviceSelected,
+<<<<<<< HEAD
     this.onViewReport,
     this.selectionKey,
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   });
 
   final ReportDraft draft; // بيانات التقرير القادمة من صفحة الإعداد.
   final ValueChanged<CatalogDevice> onDeviceSelected; // الجهاز المختار.
+<<<<<<< HEAD
   final VoidCallback? onViewReport; // يفتح صفحة أحمال التقرير.
   final GlobalKey<DeviceSelectionPageState>? selectionKey; // يعيد الفئات.
 
   @override
   State<DeviceSelectionPage> createState() => DeviceSelectionPageState();
+=======
+
+  @override
+  State<DeviceSelectionPage> createState() => _DeviceSelectionPageState();
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 }
 
 enum _CatalogStage { categories, companies, devices }
 
+<<<<<<< HEAD
 class DeviceSelectionPageState extends State<DeviceSelectionPage> {
   final _repository = DeviceRepository(); // مصدر الكتالوج من Supabase.
   final _customRepository =
       CustomDeviceRepository(); // مصدر أجهزة المستخدم الخاصة.
+=======
+class _DeviceSelectionPageState extends State<DeviceSelectionPage> {
+  final _repository = DeviceRepository(); // مصدر الكتالوج من Supabase.
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 
   late final Future<List<DeviceCategory>> _categoriesFuture;
   Future<List<CatalogCompany>>? _companiesFuture;
   Future<List<CatalogDevice>>? _devicesFuture;
+<<<<<<< HEAD
   Future<List<CustomDevice>>? _customDevicesFuture;
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 
   _CatalogStage _stage = _CatalogStage.categories;
   DeviceCategory? _selectedCategory;
@@ -55,6 +76,7 @@ class DeviceSelectionPageState extends State<DeviceSelectionPage> {
         .fetchCategories(); // تحميل الفئات مرة واحدة.
   }
 
+<<<<<<< HEAD
   /// يعيد المستخدم إلى الفئات دون إزالة الأجهزة المحفوظة في التقرير.
   void resetToCategories() {
     if (!mounted) {
@@ -70,6 +92,8 @@ class DeviceSelectionPageState extends State<DeviceSelectionPage> {
     });
   }
 
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   void _openCompanies(DeviceCategory category) {
     setState(() {
       _selectedCategory = category;
@@ -80,6 +104,7 @@ class DeviceSelectionPageState extends State<DeviceSelectionPage> {
 
   void _openDevices(CatalogCompany company) {
     final category = _selectedCategory;
+<<<<<<< HEAD
     if (category == null) {
       return;
     }
@@ -94,6 +119,16 @@ class DeviceSelectionPageState extends State<DeviceSelectionPage> {
       _customDevicesFuture = company.id == -1
           ? _customRepository.fetchByCategory(category.id)
           : null;
+=======
+    if (category == null) return;
+
+    setState(() {
+      _selectedCompany = company;
+      _devicesFuture = _repository.fetchDevices(
+        categoryId: category.id,
+        companyId: company.id,
+      );
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
       _stage = _CatalogStage.devices;
     });
   }
@@ -133,9 +168,13 @@ class DeviceSelectionPageState extends State<DeviceSelectionPage> {
     return PopScope<bool>(
       canPop: _stage == _CatalogStage.categories,
       onPopInvokedWithResult: (didPop, result) {
+<<<<<<< HEAD
         if (!didPop) {
           _goBack();
         }
+=======
+        if (!didPop) _goBack();
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
       },
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -162,6 +201,7 @@ class DeviceSelectionPageState extends State<DeviceSelectionPage> {
   Widget _buildStage() {
     switch (_stage) {
       case _CatalogStage.categories:
+<<<<<<< HEAD
         return Column(
           children: [
             _ReportButton(onPressed: widget.onViewReport),
@@ -213,10 +253,39 @@ class DeviceSelectionPageState extends State<DeviceSelectionPage> {
         return _DeviceSearchPanel(
           future: _devicesFuture!,
           onDeviceSelected: widget.onDeviceSelected,
+=======
+        return _AsyncGrid<DeviceCategory>(
+          future: _categoriesFuture,
+          emptyText: 'لا توجد فئات متاحة حاليًا',
+          itemBuilder: (category) => _IconTile(
+            icon: _categoryIcon(category.iconKey),
+            title: category.name,
+            onTap: () => _openCompanies(category),
+          ),
+        );
+      case _CatalogStage.companies:
+        return _AsyncGrid<CatalogCompany>(
+          future: _companiesFuture!,
+          emptyText: 'لا توجد شركات لهذا التصنيف',
+          itemBuilder: (company) => _CompanyTile(
+            company: company,
+            onTap: () => _openDevices(company),
+          ),
+        );
+      case _CatalogStage.devices:
+        return _AsyncList<CatalogDevice>(
+          future: _devicesFuture!,
+          emptyText: 'لا توجد أجهزة لهذه الشركة',
+          itemBuilder: (device) => _DeviceTile(
+            device: device,
+            onTap: () => widget.onDeviceSelected(device),
+          ),
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
         );
     }
   }
 
+<<<<<<< HEAD
   CatalogDevice _customAsCatalogDevice(CustomDevice device) {
     return CatalogDevice(
       id: -device.id,
@@ -239,6 +308,8 @@ class DeviceSelectionPageState extends State<DeviceSelectionPage> {
     );
   }
 
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   IconData _categoryIcon(String key) {
     const icons = <String, IconData>{
       'tv': Icons.tv_rounded,
@@ -256,6 +327,7 @@ class DeviceSelectionPageState extends State<DeviceSelectionPage> {
   }
 }
 
+<<<<<<< HEAD
 class _ReportButton extends StatelessWidget {
   const _ReportButton({required this.onPressed});
 
@@ -277,6 +349,8 @@ class _ReportButton extends StatelessWidget {
   }
 }
 
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 class _Header extends StatelessWidget {
   const _Header({
     required this.stage,
@@ -351,6 +425,7 @@ class _Header extends StatelessWidget {
   }
 }
 
+<<<<<<< HEAD
 class _AsyncCompanyGrid extends StatelessWidget {
   const _AsyncCompanyGrid({required this.companies, required this.onTap});
 
@@ -555,6 +630,8 @@ class _CustomDeviceSearchPanelState extends State<_CustomDeviceSearchPanel> {
   }
 }
 
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 class _AsyncGrid<T> extends StatelessWidget {
   const _AsyncGrid({
     required this.future,
@@ -579,9 +656,13 @@ class _AsyncGrid<T> extends StatelessWidget {
         }
 
         final items = snapshot.data ?? <T>[];
+<<<<<<< HEAD
         if (items.isEmpty) {
           return _MessageState(message: emptyText);
         }
+=======
+        if (items.isEmpty) return _MessageState(message: emptyText);
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 
         return GridView.builder(
           padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
@@ -600,6 +681,7 @@ class _AsyncGrid<T> extends StatelessWidget {
   }
 }
 
+<<<<<<< HEAD
 class _DeviceSearchPanel extends StatefulWidget {
   const _DeviceSearchPanel({
     required this.future,
@@ -675,6 +757,23 @@ class _DeviceSearchPanelState extends State<_DeviceSearchPanel> {
   Widget build(BuildContext context) {
     return FutureBuilder<List<CatalogDevice>>(
       future: widget.future,
+=======
+class _AsyncList<T> extends StatelessWidget {
+  const _AsyncList({
+    required this.future,
+    required this.itemBuilder,
+    required this.emptyText,
+  });
+
+  final Future<List<T>> future;
+  final Widget Function(T item) itemBuilder;
+  final String emptyText;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<T>>(
+      future: future,
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -682,6 +781,7 @@ class _DeviceSearchPanelState extends State<_DeviceSearchPanel> {
         if (snapshot.hasError) {
           return const _MessageState(message: 'تعذر تحميل الأجهزة من Supabase');
         }
+<<<<<<< HEAD
 
         final devices = _filter(snapshot.data ?? <CatalogDevice>[]);
         return Column(
@@ -709,12 +809,24 @@ class _DeviceSearchPanelState extends State<_DeviceSearchPanel> {
                     ),
             ),
           ],
+=======
+        final items = snapshot.data ?? <T>[];
+        if (items.isEmpty) return _MessageState(message: emptyText);
+
+        return ListView.separated(
+          padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
+          physics: const BouncingScrollPhysics(),
+          itemCount: items.length,
+          separatorBuilder: (_, index) => const SizedBox(height: 12),
+          itemBuilder: (context, index) => itemBuilder(items[index]),
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
         );
       },
     );
   }
 }
 
+<<<<<<< HEAD
 class _DeviceSearchFields extends StatelessWidget {
   const _DeviceSearchFields({
     required this.modelController,
@@ -1026,6 +1138,8 @@ class _CustomDeviceFormDialogState extends State<_CustomDeviceFormDialog> {
   }
 }
 
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 class _IconTile extends StatelessWidget {
   const _IconTile({
     required this.icon,
@@ -1231,9 +1345,13 @@ class _CompanyLogoState extends State<_CompanyLogo> {
   @override
   Widget build(BuildContext context) {
     final future = _logoFuture;
+<<<<<<< HEAD
     if (future == null) {
       return _fallback();
     }
+=======
+    if (future == null) return _fallback();
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 
     return FutureBuilder<File>(
       future: future,

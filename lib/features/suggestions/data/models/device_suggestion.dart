@@ -25,6 +25,7 @@ class DeviceSuggestion {
     };
   }
 }
+<<<<<<< HEAD
 
 /// يمثل طلب جهاز محفوظًا ويظهر لصاحبه فقط في صفحة الاقتراح.
 class SubmittedDeviceSuggestion {
@@ -66,3 +67,5 @@ class SubmittedDeviceSuggestion {
     );
   }
 }
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4

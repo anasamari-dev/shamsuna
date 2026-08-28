@@ -252,7 +252,10 @@ class _CompaniesTab extends StatelessWidget {
                   );
                 }
                 final item = companies[index];
+<<<<<<< HEAD
                 final companyId = (item['company_id'] as num).toInt();
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
                 return _GlassTile(
                   child: ListTile(
                     leading: _CompanyIcon(url: item['icon_url'] as String?),
@@ -264,6 +267,7 @@ class _CompaniesTab extends StatelessWidget {
                       item['is_active'] == true ? 'مفعلة' : 'معطلة',
                       style: const TextStyle(color: AppColors.textMuted),
                     ),
+<<<<<<< HEAD
                     trailing: IconButton(
                       tooltip: 'تعديل الشركة',
                       icon: const Icon(
@@ -293,6 +297,8 @@ class _CompaniesTab extends StatelessWidget {
                         }
                       },
                     ),
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
                   ),
                 );
               },
@@ -701,6 +707,7 @@ class _CompanyForm {
 }
 
 class _CompanyDialog extends StatefulWidget {
+<<<<<<< HEAD
   const _CompanyDialog({
     this.initialName = '',
     this.initialIconUrl,
@@ -711,11 +718,15 @@ class _CompanyDialog extends StatefulWidget {
   final String? initialIconUrl;
   final bool isEditing;
 
+=======
+  const _CompanyDialog();
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   @override
   State<_CompanyDialog> createState() => _CompanyDialogState();
 }
 
 class _CompanyDialogState extends State<_CompanyDialog> {
+<<<<<<< HEAD
   late final TextEditingController _name;
   late final TextEditingController _icon;
 
@@ -725,6 +736,10 @@ class _CompanyDialogState extends State<_CompanyDialog> {
     _name = TextEditingController(text: widget.initialName);
     _icon = TextEditingController(text: widget.initialIconUrl ?? '');
   }
+=======
+  final _name = TextEditingController();
+  final _icon = TextEditingController();
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 
   @override
   void dispose() {
@@ -743,7 +758,11 @@ class _CompanyDialogState extends State<_CompanyDialog> {
       borderRadius: BorderRadius.circular(26),
       side: const BorderSide(color: AppColors.border),
     ),
+<<<<<<< HEAD
     title: Text(widget.isEditing ? 'تعديل الشركة' : 'إضافة شركة'),
+=======
+    title: const Text('إضافة شركة'),
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
     content: Column(
       mainAxisSize: MainAxisSize.min,
       children: [

@@ -2,7 +2,11 @@
 # See https://dart.dev/tools/pub/glossary#lockfile
 packages:
   app_links:
+<<<<<<< HEAD
     dependency: "direct main"
+=======
+    dependency: transitive
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
     description:
       name: app_links
       sha256: f8db46d2ea9ff6f3a37191a7fd5b7813da1253ace8c32c1b9eadace41d1188ea
@@ -89,6 +93,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
+<<<<<<< HEAD
   checked_yaml:
     dependency: transitive
     description:
@@ -105,6 +110,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.2"
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   clock:
     dependency: transitive
     description:
@@ -238,6 +245,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.4.2"
+<<<<<<< HEAD
   flutter_launcher_icons:
     dependency: "direct dev"
     description:
@@ -246,6 +254,8 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.14.4"
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   flutter_lints:
     dependency: "direct dev"
     description:

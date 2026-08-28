@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_background.dart';
+<<<<<<< HEAD
 import '../../../../core/widgets/shamsuna_bottom_bar.dart';
 import '../../../reports/presentation/pages/compare_reports_page.dart';
 import '../../../reports/presentation/pages/my_reports_page.dart';
 import '../../../suggestions/presentation/pages/suggest_device_page.dart';
 
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 import '../../data/models/battery_type.dart';
 import '../../data/models/system_voltage.dart';
 import '../../data/repositories/battery_repository.dart';
@@ -13,6 +16,7 @@ import '../models/report_draft.dart';
 
 /// صفحة إعداد التقرير بالاعتماد على بيانات Supabase.
 class ReportSetupPage extends StatefulWidget {
+<<<<<<< HEAD
   const ReportSetupPage({
     super.key,
     required this.onContinue,
@@ -21,6 +25,11 @@ class ReportSetupPage extends StatefulWidget {
 
   final ValueChanged<ReportDraft> onContinue;
   final bool showBottomBar; // يرسل التقرير للخطوة التالية.
+=======
+  const ReportSetupPage({super.key, required this.onContinue});
+
+  final ValueChanged<ReportDraft> onContinue; // يرسل التقرير للخطوة التالية.
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 
   @override
   State<ReportSetupPage> createState() => _ReportSetupPageState();
@@ -80,6 +89,7 @@ class _ReportSetupPageState extends State<ReportSetupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
+<<<<<<< HEAD
       resizeToAvoidBottomInset: false,
       extendBody: true,
       bottomNavigationBar: widget.showBottomBar
@@ -102,6 +112,8 @@ class _ReportSetupPageState extends State<ReportSetupPage> {
               ),
             )
           : null,
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
       body: AppBackground(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -114,7 +126,11 @@ class _ReportSetupPageState extends State<ReportSetupPage> {
               title: const Text('إنشاء تقرير'),
             ),
             SliverPadding(
+<<<<<<< HEAD
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
+=======
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
               sliver: SliverToBoxAdapter(
                 child: Form(
                   key: _formKey,

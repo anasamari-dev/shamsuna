@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_background.dart';
+<<<<<<< HEAD
 import '../../../../core/widgets/shamsuna_bottom_bar.dart';
 
 import '../../data/models/user_report.dart';
@@ -17,6 +18,15 @@ class CompareReportsPage extends StatefulWidget {
   const CompareReportsPage({super.key, this.showBottomBar = true});
 
   final bool showBottomBar;
+=======
+import '../../data/models/user_report.dart';
+import '../../data/repositories/comparison_repository.dart';
+import 'report_comparison_result_page.dart';
+
+/// صفحة اختيار تقريرين محفوظين للمقارنة.
+class CompareReportsPage extends StatefulWidget {
+  const CompareReportsPage({super.key});
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 
   @override
   State<CompareReportsPage> createState() => _CompareReportsPageState();
@@ -35,6 +45,7 @@ class _CompareReportsPageState extends State<CompareReportsPage> {
     _reportsFuture = _repository.fetchSelectableReports();
   }
 
+<<<<<<< HEAD
   void _openCreateReport() {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -47,6 +58,8 @@ class _CompareReportsPageState extends State<CompareReportsPage> {
     );
   }
 
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
   Future<void> _compare() async {
     final first = _first;
     final second = _second;
@@ -76,6 +89,7 @@ class _CompareReportsPageState extends State<CompareReportsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
+<<<<<<< HEAD
       resizeToAvoidBottomInset: false,
       extendBody: true,
       bottomNavigationBar: widget.showBottomBar
@@ -96,6 +110,8 @@ class _CompareReportsPageState extends State<CompareReportsPage> {
               ),
             )
           : null,
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
       body: AppBackground(
         child: SafeArea(
           child: FutureBuilder<List<UserReport>>(
@@ -175,7 +191,11 @@ class _SelectionContent extends StatelessWidget {
           centerTitle: true,
         ),
         SliverPadding(
+<<<<<<< HEAD
           padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
+=======
+          padding: const EdgeInsets.all(20),
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
           sliver: SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,

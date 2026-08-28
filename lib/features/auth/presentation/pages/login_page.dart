@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'register_page.dart';
+<<<<<<< HEAD
 import 'forgot_password_page.dart';
 
+=======
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/app_background.dart';
 
@@ -196,9 +199,13 @@ class _GlassLoginPanel extends StatelessWidget {
           Align(
             alignment: AlignmentDirectional.centerStart,
             child: TextButton(
+<<<<<<< HEAD
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const ForgotPasswordPage()),
               ),
+=======
+              onPressed: () {},
+>>>>>>> ec2563a0ac07910e35562165fb3765b4c3ba9ba4
               child: const Text('نسيت كلمة المرور؟'),
             ),
           ),
