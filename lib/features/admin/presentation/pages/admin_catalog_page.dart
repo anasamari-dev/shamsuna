@@ -252,6 +252,7 @@ class _CompaniesTab extends StatelessWidget {
                   );
                 }
                 final item = companies[index];
+                final companyId = (item['company_id'] as num).toInt();
                 return _GlassTile(
                   child: ListTile(
                     leading: _CompanyIcon(url: item['icon_url'] as String?),
@@ -262,6 +263,35 @@ class _CompaniesTab extends StatelessWidget {
                     subtitle: Text(
                       item['is_active'] == true ? 'مفعلة' : 'معطلة',
                       style: const TextStyle(color: AppColors.textMuted),
+                    ),
+                    trailing: IconButton(
+                      tooltip: 'تعديل الشركة',
+                      icon: const Icon(
+                        Icons.edit_outlined,
+                        color: AppColors.textLight,
+                      ),
+                      onPressed: () async {
+                        final result = await showDialog<_CompanyForm>(
+                          context: context,
+                          builder: (_) => _CompanyDialog(
+                            initialName: '${item['name']}',
+                            initialIconUrl: item['icon_url'] as String?,
+                            isEditing: true,
+                          ),
+                        );
+                        if (result == null) return;
+                        try {
+                          await repository.updateCompany(
+                            companyId: companyId,
+                            name: result.name,
+                            iconUrl: result.iconUrl,
+                            isActive: item['is_active'] == true,
+                          );
+                          onCategoryChanged(selectedCategoryId);
+                        } catch (error) {
+                          onError('تعذر تحديث الشركة: $error');
+                        }
+                      },
                     ),
                   ),
                 );
@@ -671,14 +701,30 @@ class _CompanyForm {
 }
 
 class _CompanyDialog extends StatefulWidget {
-  const _CompanyDialog();
+  const _CompanyDialog({
+    this.initialName = '',
+    this.initialIconUrl,
+    this.isEditing = false,
+  });
+
+  final String initialName;
+  final String? initialIconUrl;
+  final bool isEditing;
+
   @override
   State<_CompanyDialog> createState() => _CompanyDialogState();
 }
 
 class _CompanyDialogState extends State<_CompanyDialog> {
-  final _name = TextEditingController();
-  final _icon = TextEditingController();
+  late final TextEditingController _name;
+  late final TextEditingController _icon;
+
+  @override
+  void initState() {
+    super.initState();
+    _name = TextEditingController(text: widget.initialName);
+    _icon = TextEditingController(text: widget.initialIconUrl ?? '');
+  }
 
   @override
   void dispose() {
@@ -697,7 +743,7 @@ class _CompanyDialogState extends State<_CompanyDialog> {
       borderRadius: BorderRadius.circular(26),
       side: const BorderSide(color: AppColors.border),
     ),
-    title: const Text('إضافة شركة'),
+    title: Text(widget.isEditing ? 'تعديل الشركة' : 'إضافة شركة'),
     content: Column(
       mainAxisSize: MainAxisSize.min,
       children: [

@@ -20,6 +20,7 @@ class _MainShellPageState extends State<MainShellPage> {
   int _currentIndex = 2; // الرئيسية هي التبويب الافتراضي.
 
   void _selectTab(int index) {
+    FocusManager.instance.primaryFocus?.unfocus();
     if (_currentIndex == index) return;
     setState(() => _currentIndex = index);
   }
@@ -28,6 +29,7 @@ class _MainShellPageState extends State<MainShellPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: false,
       extendBody: true,
       body: IndexedStack(
         index: _currentIndex,
@@ -42,7 +44,7 @@ class _MainShellPageState extends State<MainShellPage> {
             ),
           ),
           const MyReportsPage(showBottomBar: false),
-          const HomePage(showBottomBar: false),
+          HomePage(showBottomBar: false, onTabSelected: _selectTab),
           const CompareReportsPage(showBottomBar: false),
           const SuggestDevicePage(showBottomBar: false),
         ],

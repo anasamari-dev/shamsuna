@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shamsuna/features/auth/presentation/pages/login_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -20,6 +19,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   bool _hidePassword = true;
   bool _hideConfirm = true;
   bool _isLoading = false;
+  bool _isFinishing = false;
   String? _errorMessage;
 
   @override
@@ -27,6 +27,25 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     _passwordController.dispose();
     _confirmController.dispose();
     super.dispose();
+  }
+
+  /// ينهي جلسة الاستعادة دون استعمال context بعد إزالة الصفحة.
+  /// يتولى AuthGate عرض LoginPage تلقائيًا عند وصول حدث تسجيل الخروج.
+  Future<void> _finishResetFlow() async {
+    if (_isFinishing) return;
+
+    _isFinishing = true;
+    if (mounted) {
+      setState(() {});
+    }
+
+    try {
+      await Supabase.instance.client.auth.signOut().timeout(
+        const Duration(seconds: 5),
+      );
+    } catch (_) {
+      // لا نستخدم context هنا؛ الصفحة قد تكون أزيلت أثناء تحديث AuthGate.
+    }
   }
 
   Future<void> _updatePassword() async {
@@ -43,28 +62,25 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
       );
 
       if (!mounted) return;
+
       await showDialog<void>(
         context: context,
         barrierDismissible: false,
-        builder: (_) => AlertDialog(
+        builder: (dialogContext) => AlertDialog(
           title: const Text('تم تحديث كلمة المرور'),
           content: const Text('يمكنك الآن استخدام كلمة المرور الجديدة.'),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: _isFinishing
+                  ? null
+                  : () async {
+                      Navigator.of(dialogContext).pop();
+                      await _finishResetFlow();
+                    },
               child: const Text('متابعة'),
             ),
           ],
         ),
-      );
-
-      await Supabase.instance.client.auth.signOut();
-
-      if (!mounted) return;
-
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const LoginPage()),
-        (route) => false,
       );
     } on AuthException catch (error) {
       if (!mounted) return;

@@ -88,10 +88,18 @@ class _EditReportPageState extends State<EditReportPage> {
   }
 
   Future<void> _addDevice() async {
+    // نستخدم مفتاحًا لإعادة صفحة الاختيار إلى الفئات بعد حفظ كل جهاز.
+    final selectionKey = GlobalKey<DeviceSelectionPageState>();
+
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => DeviceSelectionPage(
+          key: selectionKey,
           draft: _draft!,
+          onViewReport: () {
+            // يغلق صفحة الاختيار ويعيد المستخدم إلى محرر التقرير.
+            Navigator.of(context).pop();
+          },
           onDeviceSelected: (device) {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -99,8 +107,20 @@ class _EditReportPageState extends State<EditReportPage> {
                   draft: _draft!,
                   device: device,
                   onSaved: (detail) {
+                    // يضيف الحمل إلى مسودة التقرير المعدلة.
                     setState(() => _details.add(detail));
+
+                    // يغلق صفحة إدخال الحمل فقط ويبقي المستخدم داخل الاختيار.
                     Navigator.of(context).pop();
+                    selectionKey.currentState?.resetToCategories();
+
+                    // يوضح للمستخدم أن الإضافة تمت دون فتح التقرير تلقائيًا.
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('تمت إضافة الجهاز إلى التقرير'),
+                        duration: Duration(milliseconds: 900),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -123,6 +143,7 @@ class _EditReportPageState extends State<EditReportPage> {
             setState(() => _details[index] = detail);
             Navigator.of(context).pop();
           },
+          
         ),
       ),
     );

@@ -61,10 +61,18 @@ class _ReportDevicesPageState extends State<ReportDevicesPage> {
   }
 
   Future<void> _chooseDevice() async {
+    // نستخدم مفتاحًا للتحكم في صفحة الاختيار وإعادتها إلى الفئات بعد الحفظ.
+    final selectionKey = GlobalKey<DeviceSelectionPageState>();
+
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => DeviceSelectionPage(
+          key: selectionKey,
           draft: widget.draft,
+          onViewReport: () {
+            // يغلق صفحة الاختيار ويعيد المستخدم إلى تقرير الأحمال عند الطلب.
+            Navigator.of(context).pop();
+          },
           onDeviceSelected: (device) {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -72,8 +80,20 @@ class _ReportDevicesPageState extends State<ReportDevicesPage> {
                   draft: widget.draft,
                   device: device,
                   onSaved: (detail) {
+                    // نحفظ الجهاز داخل قائمة التقرير الحالية.
                     setState(() => _details.add(detail));
+
+                    // نغلق صفحة إدخال الحمل فقط، ونبقى داخل صفحة الاختيار.
                     Navigator.of(context).pop();
+                    selectionKey.currentState?.resetToCategories();
+
+                    // نعرض تنبيهًا قصيرًا دون فتح تقرير الأحمال تلقائيًا.
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('تمت إضافة الجهاز إلى التقرير'),
+                        duration: Duration(milliseconds: 900),
+                      ),
+                    );
                   },
                 ),
               ),
@@ -83,6 +103,7 @@ class _ReportDevicesPageState extends State<ReportDevicesPage> {
       ),
     );
 
+    // يعيد بناء ملخص الأحمال عند العودة إلى صفحة التقرير.
     if (mounted) setState(() {});
   }
 

@@ -2,6 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../calculation/data/models/battery_type.dart';
 import '../../../calculation/data/models/catalog_device.dart';
+import '../../../calculation/data/models/custom_device.dart';
 import '../../../calculation/data/models/system_voltage.dart';
 import '../../../calculation/presentation/models/report_device_detail_draft.dart';
 import '../../../calculation/presentation/models/report_draft.dart';
@@ -57,27 +58,55 @@ class ReportsRepository {
   Future<List<ReportDeviceDetailDraft>> fetchDetails(int reportId) async {
     final rows = await _client
         .from('report_device_details')
-        .select('device_id, quantity, day_hours, night_hours')
+        .select('device_id, custom_device_id, quantity, day_hours, night_hours')
         .eq('report_id', reportId)
         .order('detail_id');
     if (rows.isEmpty) return const [];
 
-    final ids = rows.map((row) => (row['device_id'] as num).toInt()).toList();
-    final devices = await _client
-        .from('catalog_devices')
-        .select(
-          'device_id, category_id, company_id, model_name, short_name, description, wattage_w, specifications',
-        )
-        .inFilter('device_id', ids);
-    final byId = <int, CatalogDevice>{};
-    for (final row in devices) {
-      final device = CatalogDevice.fromMap(Map<String, dynamic>.from(row));
-      byId[device.id] = device;
+    final catalogIds = rows
+        .where((row) => row['device_id'] != null)
+        .map((row) => (row['device_id'] as num).toInt())
+        .toList(growable: false);
+    final customIds = rows
+        .where((row) => row['custom_device_id'] != null)
+        .map((row) => (row['custom_device_id'] as num).toInt())
+        .toList(growable: false);
+
+    final byCatalogId = <int, CatalogDevice>{};
+    if (catalogIds.isNotEmpty) {
+      final devices = await _client
+          .from('catalog_devices')
+          .select(
+            'device_id, category_id, company_id, model_name, short_name, description, wattage_w, specifications',
+          )
+          .inFilter('device_id', catalogIds);
+      for (final row in devices) {
+        final device = CatalogDevice.fromMap(Map<String, dynamic>.from(row));
+        byCatalogId[device.id] = device;
+      }
+    }
+
+    final byCustomId = <int, CatalogDevice>{};
+    if (customIds.isNotEmpty) {
+      final customRows = await _client
+          .from('custom_devices')
+          .select(
+            'custom_device_id, owner_id, category_id, name, company_name, model_name, description, wattage_w, specifications, is_active, created_at, updated_at',
+          )
+          .inFilter('custom_device_id', customIds)
+          .eq('is_active', true);
+      for (final row in customRows) {
+        final custom = CustomDevice.fromMap(Map<String, dynamic>.from(row));
+        byCustomId[custom.id] = _customAsCatalogDevice(custom);
+      }
     }
 
     return rows
         .map((row) {
-          final device = byId[(row['device_id'] as num).toInt()];
+          final isCustom = row['custom_device_id'] != null;
+          final device = isCustom
+              ? byCustomId[(row['custom_device_id'] as num).toInt()]
+              : byCatalogId[(row['device_id'] as num).toInt()];
           if (device == null) {
             throw Exception('أحد أجهزة التقرير لم يعد موجودًا في الكتالوج');
           }
@@ -89,6 +118,28 @@ class ReportsRepository {
           );
         })
         .toList(growable: false);
+  }
+
+  CatalogDevice _customAsCatalogDevice(CustomDevice device) {
+    return CatalogDevice(
+      id: -device.id,
+      categoryId: device.categoryId,
+      companyId: 0,
+      modelName: device.modelName?.trim().isNotEmpty == true
+          ? device.modelName!
+          : device.name,
+      shortName: device.name,
+      description: device.description?.trim().isNotEmpty == true
+          ? device.description!
+          : device.companyName ?? 'جهاز خاص بالمستخدم',
+      wattageW: device.wattageW,
+      specifications: <String, dynamic>{
+        ...device.specifications,
+        '_custom_device_id': device.id,
+        '_is_custom_device': true,
+        '_custom_company_name': device.companyName,
+      },
+    );
   }
 
   Future<List<SystemVoltage>> fetchVoltages() async {
@@ -142,7 +193,10 @@ class ReportsRepository {
         'p_details': details
             .map(
               (item) => {
-                'device_id': item.device.id,
+                'device_id': item.isCustomDevice ? null : item.device.id,
+                'custom_device_id': item.isCustomDevice
+                    ? item.customDeviceId
+                    : null,
                 'quantity': item.quantity,
                 'day_hours': item.dayHours,
                 'night_hours': item.nightHours,

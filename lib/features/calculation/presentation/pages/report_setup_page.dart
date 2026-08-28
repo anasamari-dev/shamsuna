@@ -19,9 +19,8 @@ class ReportSetupPage extends StatefulWidget {
     this.showBottomBar = true,
   });
 
-  final bool showBottomBar;
-
-  final ValueChanged<ReportDraft> onContinue; // يرسل التقرير للخطوة التالية.
+  final ValueChanged<ReportDraft> onContinue;
+  final bool showBottomBar; // يرسل التقرير للخطوة التالية.
 
   @override
   State<ReportSetupPage> createState() => _ReportSetupPageState();
@@ -81,25 +80,28 @@ class _ReportSetupPageState extends State<ReportSetupPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: false,
       extendBody: true,
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
-        child: ShamsunaBottomBar(
-          currentIndex: 0,
-          onCreateReport: () {},
-          onMyReports: () => Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => const MyReportsPage())),
-          onHome: () =>
-              Navigator.of(context).popUntil((route) => route.isFirst),
-          onCompare: () => Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => const CompareReportsPage())),
-          onSuggestDevice: () => Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => const SuggestDevicePage())),
-        ),
-      ),
+      bottomNavigationBar: widget.showBottomBar
+          ? Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+              child: ShamsunaBottomBar(
+                currentIndex: 0,
+                onCreateReport: () {},
+                onMyReports: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const MyReportsPage()),
+                ),
+                onHome: () =>
+                    Navigator.of(context).popUntil((route) => route.isFirst),
+                onCompare: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const CompareReportsPage()),
+                ),
+                onSuggestDevice: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const SuggestDevicePage()),
+                ),
+              ),
+            )
+          : null,
       body: AppBackground(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),

@@ -76,23 +76,26 @@ class _CompareReportsPageState extends State<CompareReportsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: false,
       extendBody: true,
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
-        child: ShamsunaBottomBar(
-          currentIndex: 3,
-          onCreateReport: _openCreateReport,
-          onMyReports: () => Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => const MyReportsPage())),
-          onHome: () =>
-              Navigator.of(context).popUntil((route) => route.isFirst),
-          onCompare: () {},
-          onSuggestDevice: () => Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => const SuggestDevicePage())),
-        ),
-      ),
+      bottomNavigationBar: widget.showBottomBar
+          ? Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+              child: ShamsunaBottomBar(
+                currentIndex: 3,
+                onCreateReport: _openCreateReport,
+                onMyReports: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const MyReportsPage()),
+                ),
+                onHome: () =>
+                    Navigator.of(context).popUntil((route) => route.isFirst),
+                onCompare: () {},
+                onSuggestDevice: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const SuggestDevicePage()),
+                ),
+              ),
+            )
+          : null,
       body: AppBackground(
         child: SafeArea(
           child: FutureBuilder<List<UserReport>>(

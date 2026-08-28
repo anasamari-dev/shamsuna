@@ -14,12 +14,18 @@ import '../../../reports/presentation/pages/compare_reports_page.dart';
 import '../../../reports/presentation/pages/my_reports_page.dart';
 import '../../../suggestions/presentation/pages/suggest_device_page.dart';
 import '../../../notifications/presentation/widgets/notification_bell.dart';
+import '../widgets/home_settings_drawer.dart';
 
 /// لوحة المستخدم الرئيسية مع تمييز واجهة المشرف حسب role.
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, this.showBottomBar = true});
+  const HomePage({
+    super.key,
+    this.showBottomBar = true,
+    this.onTabSelected,
+  });
 
   final bool showBottomBar;
+  final ValueChanged<int>? onTabSelected;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -37,10 +43,18 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _signOut() => Supabase.instance.client.auth.signOut();
 
+  void _refreshProfile() {
+    if (!mounted) return;
+    setState(() {
+      _profileFuture = _profiles.fetchCurrentProfile();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: false,
       body: AppBackground(
         child: FutureBuilder<CurrentProfile>(
           future: _profileFuture,
@@ -50,22 +64,29 @@ class _HomePageState extends State<HomePage> {
                 child: CircularProgressIndicator(color: AppColors.textLight),
               );
             }
+
             if (snapshot.hasError) {
               return _HomeError(
                 message: '${snapshot.error}',
-                onRetry: () => setState(
-                  () => _profileFuture = _profiles.fetchCurrentProfile(),
-                ),
+                onRetry: () {
+                  setState(() {
+                    _profileFuture = _profiles.fetchCurrentProfile();
+                  });
+                },
               );
             }
+
             final profile = snapshot.data;
             if (profile == null) {
               return const _HomeError(message: 'تعذر تحميل بيانات المستخدم');
             }
+
             return _HomeContent(
               profile: profile,
               onSignOut: _signOut,
+              onProfileUpdated: _refreshProfile,
               showBottomBar: widget.showBottomBar,
+              onTabSelected: widget.onTabSelected,
             );
           },
         ),
@@ -78,19 +99,35 @@ class _HomeContent extends StatelessWidget {
   const _HomeContent({
     required this.profile,
     required this.onSignOut,
+    required this.onProfileUpdated,
     required this.showBottomBar,
+    this.onTabSelected,
   });
 
   final CurrentProfile profile;
   final VoidCallback onSignOut;
+  final VoidCallback onProfileUpdated;
   final bool showBottomBar;
+  final ValueChanged<int>? onTabSelected;
+
+  void _selectTab(BuildContext context, int index) {
+    FocusManager.instance.primaryFocus?.unfocus();
+    onTabSelected?.call(index);
+  }
 
   void _openCreateReport(BuildContext context) {
+    if (onTabSelected != null) {
+      _selectTab(context, 0);
+      return;
+    }
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => ReportSetupPage(
           onContinue: (draft) => Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => ReportDevicesPage(draft: draft)),
+            MaterialPageRoute(
+              builder: (_) => ReportDevicesPage(draft: draft),
+            ),
           ),
         ),
       ),
@@ -101,106 +138,132 @@ class _HomeContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: false,
       extendBody: true,
+      // drawer يستخدم جهة البداية، وهي يمين المستخدم عند تفعيل RTL.
+      drawer: HomeSettingsDrawer(
+        profile: profile,
+        onProfileUpdated: onProfileUpdated,
+      ),
       bottomNavigationBar: showBottomBar
           ? Padding(
               padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
               child: ShamsunaBottomBar(
                 currentIndex: 2,
                 onCreateReport: () => _openCreateReport(context),
-                onMyReports: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const MyReportsPage()),
-                ),
-                onHome: () {},
-                onCompare: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const CompareReportsPage()),
-                ),
-                onSuggestDevice: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const SuggestDevicePage()),
-                ),
+                onMyReports: () => onTabSelected != null
+                    ? _selectTab(context, 1)
+                    : Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const MyReportsPage(),
+                        ),
+                      ),
+                onHome: () => _selectTab(context, 2),
+                onCompare: () => onTabSelected != null
+                    ? _selectTab(context, 3)
+                    : Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const CompareReportsPage(),
+                        ),
+                      ),
+                onSuggestDevice: () => onTabSelected != null
+                    ? _selectTab(context, 4)
+                    : Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const SuggestDevicePage(),
+                        ),
+                      ),
               ),
             )
           : null,
       body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          SliverAppBar(
-            pinned: true,
-            backgroundColor: Colors.transparent,
-            surfaceTintColor: Colors.transparent,
-            title: const Text('شمسنا'),
-            actions: [
-              NotificationBell(isAdmin: profile.isAdmin),
-              if (profile.isAdmin)
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            SliverAppBar(
+              pinned: true,
+              backgroundColor: Colors.transparent,
+              surfaceTintColor: Colors.transparent,
+              title: const Text('شمسنا'),
+              actions: [
+                NotificationBell(isAdmin: profile.isAdmin),
+                if (profile.isAdmin)
+                  IconButton(
+                    tooltip: 'لوحة المشرف',
+                    icon: const Icon(Icons.admin_panel_settings_outlined),
+                    onPressed: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const AdminDashboardPage(),
+                      ),
+                    ),
+                  ),
                 IconButton(
-                  tooltip: 'لوحة المشرف',
-                  icon: const Icon(Icons.admin_panel_settings_outlined),
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const AdminDashboardPage(),
-                    ),
-                  ),
+                  tooltip: 'تسجيل الخروج',
+                  onPressed: onSignOut,
+                  icon: const Icon(Icons.logout_rounded),
                 ),
-              IconButton(
-                tooltip: 'تسجيل الخروج',
-                onPressed: onSignOut,
-                icon: const Icon(Icons.logout_rounded),
-              ),
-            ],
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 26, 20, 132),
-            sliver: SliverToBoxAdapter(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'مرحبًا بك في شمسنا',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: AppColors.textLight,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'مرحبًا ${profile.displayName}، ابدأ بتصميم منظومتك الشمسية',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textMuted,
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  if (profile.isAdmin) const _AdminModeChip(),
-                  if (profile.isAdmin) const SizedBox(height: 24),
-                  const Text(
-                    'ماذا تريد أن تفعل؟',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textLight,
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  _DashboardGrid(
-                    onCreateReport: () => _openCreateReport(context),
-                    onArchive: () => Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const MyReportsPage()),
-                    ),
-                    onCompare: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const CompareReportsPage(),
+              ],
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(20, 26, 20, 132),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'مرحبًا بك في شمسنا',
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        color: AppColors.textLight,
                       ),
                     ),
-                    onSuggestDevice: () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const SuggestDevicePage(),
+                    const SizedBox(height: 6),
+                    Text(
+                      'مرحبًا ${profile.displayName}، ابدأ بتصميم منظومتك الشمسية',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textMuted,
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 18),
+                    if (profile.isAdmin) const _AdminModeChip(),
+                    if (profile.isAdmin) const SizedBox(height: 24),
+                    const Text(
+                      'ماذا تريد أن تفعل؟',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textLight,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    _DashboardGrid(
+                      onCreateReport: () => _openCreateReport(context),
+                      onArchive: () => onTabSelected != null
+                          ? _selectTab(context, 1)
+                          : Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const MyReportsPage(),
+                              ),
+                            ),
+                      onCompare: () => onTabSelected != null
+                          ? _selectTab(context, 3)
+                          : Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const CompareReportsPage(),
+                              ),
+                            ),
+                      onSuggestDevice: () => onTabSelected != null
+                          ? _selectTab(context, 4)
+                          : Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => const SuggestDevicePage(),
+                              ),
+                            ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
     );
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -31,6 +33,7 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
   final _suggestions = SuggestionsRepository();
 
   late Future<List<DeviceCategory>> _categoriesFuture;
+  late Future<List<SubmittedDeviceSuggestion>> _mySuggestionsFuture;
   int? _categoryId;
   bool _saving = false;
 
@@ -38,6 +41,7 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
   void initState() {
     super.initState();
     _categoriesFuture = _categories.fetchCategories();
+    _mySuggestionsFuture = _suggestions.fetchMine();
   }
 
   @override
@@ -49,30 +53,67 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
   }
 
   Future<void> _submit() async {
+    // نغلق لوحة المفاتيح قبل بدء الطلب حتى لا تتعارض مع تغيير حالة الصفحة.
+    FocusManager.instance.primaryFocus?.unfocus();
+
     if (!_formKey.currentState!.validate()) return;
+    if (_saving) return;
+
     setState(() => _saving = true);
 
     try {
-      await _suggestions.submit(
-        DeviceSuggestion(
-          categoryId: _categoryId!,
-          companyName: _company.text,
-          modelName: _model.text,
-          wattageW: double.parse(_wattage.text.trim()),
-        ),
+      final suggestion = DeviceSuggestion(
+        categoryId: _categoryId!,
+        companyName: _company.text.trim(),
+        modelName: _model.text.trim(),
+        wattageW: double.parse(_wattage.text.trim()),
       );
+
+      // توجد مهلة داخل المستودع، وهذه المهلة الخارجية تحمي الواجهة أيضًا.
+      await _suggestions.submit(suggestion).timeout(
+        const Duration(seconds: 20),
+      );
+
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('تم إرسال اقتراح الجهاز للمراجعة')),
       );
-      Navigator.of(context).pop();
-    } catch (error) {
+
+      // يعيد تحميل قائمة طلبات المستخدم بعد نجاح الإرسال مباشرة.
+      setState(() {
+        _mySuggestionsFuture = _suggestions.fetchMine();
+      });
+
+      // لا نغلق الصفحة إذا كانت هي الصفحة الجذرية؛ فهذا يمنع ظهور شاشة سوداء.
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).maybePop();
+      } else {
+        _company.clear();
+        _model.clear();
+        _wattage.clear();
+        setState(() => _categoryId = null);
+      }
+    } on TimeoutException {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('تعذر إرسال الاقتراح: $error')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('انتهت مهلة الإرسال. تحقق من الإنترنت ثم حاول مرة أخرى.'),
+        ),
+      );
+    } catch (error, stackTrace) {
+      // يظهر الخطأ في DEBUG CONSOLE دون إسقاط التطبيق.
+      debugPrint('SuggestDevicePage submit error: $error');
+      debugPrintStack(stackTrace: stackTrace);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('تعذر إرسال الاقتراح: $error')),
+      );
     } finally {
-      if (mounted) setState(() => _saving = false);
+      if (mounted) {
+        setState(() => _saving = false);
+      }
     }
   }
 
@@ -80,8 +121,10 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
+      resizeToAvoidBottomInset: false,
       extendBody: true,
-      bottomNavigationBar: Padding(
+      bottomNavigationBar: widget.showBottomBar
+          ? Padding(
         padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
         child: ShamsunaBottomBar(
           currentIndex: 4,
@@ -100,7 +143,8 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
           ).push(MaterialPageRoute(builder: (_) => const CompareReportsPage())),
           onSuggestDevice: () {},
         ),
-      ),
+      )
+          : null,
       body: AppBackground(
         child: SafeArea(
           child: CustomScrollView(
@@ -114,7 +158,7 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
                 centerTitle: true,
               ),
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
                 sliver: SliverToBoxAdapter(
                   child: _GlassPanel(
                     child: Form(
@@ -232,6 +276,19 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
                   ),
                 ),
               ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 120),
+                sliver: SliverToBoxAdapter(
+                  child: _MySuggestionsPanel(
+                    future: _mySuggestionsFuture,
+                    onRetry: () {
+                      setState(() {
+                        _mySuggestionsFuture = _suggestions.fetchMine();
+                      });
+                    },
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -272,6 +329,178 @@ class _SuggestDevicePageState extends State<SuggestDevicePage> {
       prefixIcon: Icon(icon, color: AppColors.textMuted),
       labelStyle: const TextStyle(color: AppColors.textMuted),
     );
+  }
+}
+
+class _MySuggestionsPanel extends StatelessWidget {
+  const _MySuggestionsPanel({
+    required this.future,
+    required this.onRetry,
+  });
+
+  final Future<List<SubmittedDeviceSuggestion>> future;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<SubmittedDeviceSuggestion>>(
+      future: future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const _GlassPanel(
+            child: Center(
+              child: CircularProgressIndicator(color: AppColors.textLight),
+            ),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return _GlassPanel(
+            child: Column(
+              children: [
+                const Text(
+                  'تعذر تحميل طلباتك السابقة',
+                  style: TextStyle(color: AppColors.textLight),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: onRetry,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('إعادة المحاولة'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        final suggestions = snapshot.data ?? const <SubmittedDeviceSuggestion>[];
+        return _GlassPanel(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'طلباتي السابقة',
+                textAlign: TextAlign.right,
+                style: TextStyle(
+                  color: AppColors.textLight,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'تابع حالة الأجهزة التي أرسلتها للمراجعة.',
+                textAlign: TextAlign.right,
+                style: TextStyle(color: AppColors.textMuted),
+              ),
+              const SizedBox(height: 14),
+              if (suggestions.isEmpty)
+                const Text(
+                  'لم ترسل أي اقتراحات بعد.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: AppColors.textMuted),
+                )
+              else
+                ...suggestions.map(_SuggestionTile.new),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _SuggestionTile extends StatelessWidget {
+  const _SuggestionTile(this.suggestion);
+
+  final SubmittedDeviceSuggestion suggestion;
+
+  @override
+  Widget build(BuildContext context) {
+    final status = _statusPresentation(suggestion.status);
+    final company = suggestion.companyName?.trim();
+    final subtitle = company == null || company.isEmpty
+        ? '${suggestion.categoryName} • ${suggestion.wattageW.toStringAsFixed(0)} واط'
+        : '$company • ${suggestion.categoryName} • ${suggestion.wattageW.toStringAsFixed(0)} واط';
+
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.panelNavy.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          Icon(status.icon, color: status.color, size: 28),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  suggestion.modelName,
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(
+                    color: AppColors.textLight,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(
+                    color: AppColors.textMuted,
+                    fontSize: 12,
+                  ),
+                ),
+                Text(
+                  status.label,
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    color: status.color,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                if (suggestion.reviewNote?.trim().isNotEmpty == true)
+                  Text(
+                    'ملاحظة المشرف: ${suggestion.reviewNote}',
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(
+                      color: AppColors.textMuted,
+                      fontSize: 12,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+({String label, IconData icon, Color color}) _statusPresentation(String status) {
+  switch (status.toLowerCase()) {
+    case 'approved':
+      return (
+        label: 'تم الاعتماد',
+        icon: Icons.check_circle_outline,
+        color: Colors.greenAccent,
+      );
+    case 'rejected':
+      return (
+        label: 'مرفوض',
+        icon: Icons.cancel_outlined,
+        color: Colors.redAccent,
+      );
+    default:
+      return (
+        label: 'قيد المراجعة',
+        icon: Icons.hourglass_empty_rounded,
+        color: Colors.amberAccent,
+      );
   }
 }
 
